@@ -14,19 +14,26 @@
  * the License.
  */
 
-import {AuthorizationRequest} from '@openid/appauth/built/authorization_request';
-import {AuthorizationNotifier, AuthorizationRequestHandler, AuthorizationRequestResponse, BUILT_IN_PARAMETERS} from '@openid/appauth/built/authorization_request_handler';
-import {AuthorizationResponse} from '@openid/appauth/built/authorization_response';
-import {AuthorizationServiceConfiguration} from '@openid/appauth/built/authorization_service_configuration';
-import {NodeBasedHandler} from '@openid/appauth/built/node_support/node_request_handler';
-import {NodeRequestor} from '@openid/appauth/built/node_support/node_requestor';
-import {GRANT_TYPE_AUTHORIZATION_CODE, GRANT_TYPE_REFRESH_TOKEN, TokenRequest} from '@openid/appauth/built/token_request';
-import {BaseTokenRequestHandler, TokenRequestHandler} from '@openid/appauth/built/token_request_handler';
-import {TokenError, TokenResponse} from '@openid/appauth/built/token_response';
-import EventEmitter = require('events');
+import { AuthorizationRequest } from '@openid/appauth/built/authorization_request';
+import {
+  AuthorizationNotifier,
+  AuthorizationRequestHandler
+} from '@openid/appauth/built/authorization_request_handler';
+import { AuthorizationServiceConfiguration } from '@openid/appauth/built/authorization_service_configuration';
+import { NodeBasedHandler } from '@openid/appauth/built/node_support/node_request_handler';
+import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
+import {
+  GRANT_TYPE_AUTHORIZATION_CODE,
+  GRANT_TYPE_REFRESH_TOKEN,
+  TokenRequest
+} from '@openid/appauth/built/token_request';
+import { BaseTokenRequestHandler, TokenRequestHandler } from '@openid/appauth/built/token_request_handler';
+import { TokenResponse } from '@openid/appauth/built/token_response';
 
-import {log} from './logger';
-import {StringMap} from '@openid/appauth/built/types';
+import { log } from './logger';
+import { StringMap } from '@openid/appauth/built/types';
+import { AuthService } from './pkce';
+import { EventEmitter } from 'events';
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = 'on_token_response';
@@ -36,19 +43,19 @@ export class AuthStateEmitter extends EventEmitter {
 const requestor = new NodeRequestor();
 
 /* an example open id connect provider */
-const openIdConnectUrl = 'https://accounts.google.com';
+const openIdConnectUrl = 'https://dev-669532.oktapreview.com/oauth2/default';
 
 /* example client configuration */
-const clientId =
-    '511828570984-7nmej36h9j2tebiqmpqh835naet4vci4.apps.googleusercontent.com';
+const clientId = '0oafavni96j2yJNvQ0h7';
 const redirectUri = 'http://127.0.0.1:8000';
-const scope = 'openid';
+const scope = 'openid profile offline_access';
 
 export class AuthFlow {
   private notifier: AuthorizationNotifier;
   private authorizationHandler: AuthorizationRequestHandler;
   private tokenHandler: TokenRequestHandler;
   readonly authStateEmitter: AuthStateEmitter;
+  private challengePair: { verifier: string, challenge: string };
 
   // state
   private configuration: AuthorizationServiceConfiguration|null;
@@ -76,6 +83,7 @@ export class AuthFlow {
             })
       }
     });
+    this.challengePair = AuthService.getPKCEChallengePair();
   }
 
   fetchServiceConfiguration(): Promise<void> {
@@ -98,6 +106,10 @@ export class AuthFlow {
       extras['login_hint'] = username;
     }
 
+    // PKCE
+    extras['code_challenge'] = this.challengePair.challenge;
+    extras['code_challenge_method'] = 'S256';
+
     // create a request
     const request = new AuthorizationRequest(
         clientId, redirectUri, scope, AuthorizationRequest.RESPONSE_TYPE_CODE,
@@ -114,9 +126,12 @@ export class AuthFlow {
       log('Unknown service configuration');
       return Promise.resolve();
     }
+
+    let tokenRequestExtras = { code_verifier: this.challengePair.verifier };
+
     // use the code to make the token request.
     let request = new TokenRequest(
-        clientId, redirectUri, GRANT_TYPE_AUTHORIZATION_CODE, code, undefined);
+        clientId, redirectUri, GRANT_TYPE_AUTHORIZATION_CODE, code, undefined, tokenRequestExtras);
 
     return this.tokenHandler.performTokenRequest(this.configuration, request)
         .then(response => {
