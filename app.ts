@@ -69,7 +69,7 @@ export class App {
     this.fetchUserInfo.addEventListener('click', () => {
       this.authFlow.performWithFreshTokens().then(accessToken => {
         let request =
-            new Request('https://www.googleapis.com/oauth2/v3/userinfo', {
+            new Request('https://dev-669532.oktapreview.com/oauth2/default/v1/userinfo', {
               headers: new Headers({'Authorization': `Bearer ${accessToken}`}),
               method: 'GET',
               cache: 'no-cache'
@@ -116,7 +116,7 @@ export class App {
     this.handleSignIn.textContent = SIGN_OUT;
     this.fetchUserInfo.style.display = '';
     if (this.userInfo) {
-      this.userProfileImage.src = `${this.userInfo.picture}?sz=96`;
+      this.userProfileImage.src = `${this.userInfo.picture}`;
       this.userName.textContent = this.userInfo.name;
       this.showSnackBar(
           {message: `Welcome ${this.userInfo.name}`, timeout: 4000});

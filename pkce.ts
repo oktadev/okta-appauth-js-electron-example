@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const rp = require('request-promise');
 
 export class AuthService {
 
