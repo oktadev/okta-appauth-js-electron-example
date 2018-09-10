@@ -58,10 +58,10 @@ export class AuthFlow {
   private challengePair: { verifier: string, challenge: string };
 
   // state
-  private configuration: AuthorizationServiceConfiguration|null;
+  private configuration: AuthorizationServiceConfiguration | undefined;
 
-  private refreshToken: string|undefined;
-  private accessTokenResponse: TokenResponse|null;
+  private refreshToken: string | undefined;
+  private accessTokenResponse: TokenResponse | undefined;
 
   constructor() {
     this.notifier = new AuthorizationNotifier();
@@ -87,12 +87,13 @@ export class AuthFlow {
   }
 
   fetchServiceConfiguration(): Promise<void> {
-    return AuthorizationServiceConfiguration
-        .fetchFromIssuer(openIdConnectUrl, requestor)
-        .then(response => {
-          log('Fetched service configuration', response);
-          this.configuration = response;
-        });
+    return AuthorizationServiceConfiguration.fetchFromIssuer(
+      openIdConnectUrl,
+      requestor
+    ).then(response => {
+      log('Fetched service configuration', response);
+      this.configuration = response;
+    });
   }
 
   makeAuthorizationRequest(username?: string) {
@@ -101,7 +102,7 @@ export class AuthFlow {
       return;
     }
 
-    const extras: StringMap = {'prompt': 'consent', 'access_type': 'offline'};
+    const extras: StringMap = { prompt: 'consent', access_type: 'offline' };
     if (username) {
       extras['login_hint'] = username;
     }
@@ -112,13 +113,20 @@ export class AuthFlow {
 
     // create a request
     const request = new AuthorizationRequest(
-        clientId, redirectUri, scope, AuthorizationRequest.RESPONSE_TYPE_CODE,
-        undefined /* state */, extras);
+      clientId,
+      redirectUri,
+      scope,
+      AuthorizationRequest.RESPONSE_TYPE_CODE,
+      undefined /* state */,
+      extras
+    );
 
     log('Making authorization request ', this.configuration, request);
 
     this.authorizationHandler.performAuthorizationRequest(
-        this.configuration, request);
+      this.configuration,
+      request
+    );
   }
 
   private makeRefreshTokenRequest(code: string): Promise<void> {
@@ -131,16 +139,23 @@ export class AuthFlow {
 
     // use the code to make the token request.
     let request = new TokenRequest(
-        clientId, redirectUri, GRANT_TYPE_AUTHORIZATION_CODE, code, undefined, tokenRequestExtras);
+      clientId,
+      redirectUri,
+      GRANT_TYPE_AUTHORIZATION_CODE,
+      code,
+      undefined,
+      tokenRequestExtras
+    );
 
-    return this.tokenHandler.performTokenRequest(this.configuration, request)
-        .then(response => {
-          log(`Refresh Token is ${response.refreshToken}`);
-          this.refreshToken = response.refreshToken;
-          this.accessTokenResponse = response;
-          return response;
-        })
-        .then(() => {});
+    return this.tokenHandler
+      .performTokenRequest(this.configuration, request)
+      .then(response => {
+        log(`Refresh Token is ${response.refreshToken}`);
+        this.refreshToken = response.refreshToken;
+        this.accessTokenResponse = response;
+        return response;
+      })
+      .then(() => {});
   }
 
   loggedIn(): boolean {
@@ -149,7 +164,7 @@ export class AuthFlow {
 
   signOut() {
     // forget all cached token state
-    this.accessTokenResponse = null;
+    this.accessTokenResponse = undefined;
   }
 
   performWithFreshTokens(): Promise<string> {
@@ -166,12 +181,17 @@ export class AuthFlow {
       return Promise.resolve(this.accessTokenResponse.accessToken);
     }
     let request = new TokenRequest(
-        clientId, redirectUri, GRANT_TYPE_REFRESH_TOKEN, undefined,
-        this.refreshToken);
-    return this.tokenHandler.performTokenRequest(this.configuration, request)
-        .then(response => {
-          this.accessTokenResponse = response;
-          return response.accessToken;
-        });
+      clientId,
+      redirectUri,
+      GRANT_TYPE_REFRESH_TOKEN,
+      undefined,
+      this.refreshToken
+    );
+    return this.tokenHandler
+      .performTokenRequest(this.configuration, request)
+      .then(response => {
+        this.accessTokenResponse = response;
+        return response.accessToken;
+      });
   }
 }
