@@ -42,10 +42,10 @@ export class AuthStateEmitter extends EventEmitter {
 /* the Node.js based HTTP client. */
 const requestor = new NodeRequestor();
 
-/* an example open id connect provider */
+/* your Okta org URL */
 const openIdConnectUrl = 'https://dev-669532.oktapreview.com/oauth2/default';
 
-/* example client configuration */
+/* your Okta client configuration */
 const clientId = '0oag7tjqk1llPDKmx0h7';
 const redirectUri = 'http://localhost:8000';
 const scope = 'openid profile offline_access';

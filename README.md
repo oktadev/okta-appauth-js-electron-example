@@ -30,7 +30,38 @@ This will get a copy of the project installed locally. To install all of its dep
 npm i
 ```
 
-This project has a few scripts to help you with your development workflow.
+### Create a New OIDC App in Okta
+
+You will need to create an OIDC Application in Okta to get your settings to perform authentication. 
+
+1. Log in to your developer account on [developer.okta.com](https://developer.okta.com).
+2. Navigate to **Applications** and click on **Add Application**.
+3. Select **Native** and click **Next**. 
+4. Give the application a name (e.g., `My Electron App`) and add `http://localhost:8000` as a Login redirect URI.
+5. For Grant type allowed, select **Refresh Token** in addition to **Authorization Code**.
+6. Click **Done**.
+
+Modify `flow.ts` to use your Okta app's settings.
+
+```ts
+const openIdConnectUrl = 'https://{yourOktaDomain}/oauth2/default';
+const clientId = '{yourClientId}';
+```
+
+Update `app.ts` to use your app's `/userinfo` endpoint.
+
+```ts
+let request =
+    new Request('https://{yourOktaDomain}/oauth2/default/v1/userinfo', {
+      headers: new Headers({'Authorization': `Bearer ${accessToken}`}),
+      method: 'GET',
+      cache: 'no-cache'
+    });
+```
+
+Run `npm run dev` to launch the app.
+
+This project has two scripts to help you with your development workflow.
 
 * `npm run dev` will run the Electron application. This will also start the Typescript compiler in `watch` mode, and will automatically recompile your application as you start to make changes. Just reload the Electron application to see your changes.
 * `npm start` is to start the Electron application (without setting up watches that monitor for changes).
@@ -43,17 +74,6 @@ To package your app for production, [electron-builder](https://www.electron.buil
 * `npm run dist` will package in a distributable format (e.g. dmg, windows installer, deb package).
 
 If the app doesn't start after packaging, it's likely because you don't have [code signing](https://www.electron.build/code-signing) configured. To disable Code Signing when building for macOS, run `export CSC_IDENTITY_AUTO_DISCOVERY=false`. If you have an Apple Developer Account, open Xcode, go to **Preferences** > **Accounts** and make sure you're logged in and your development certificates are downloaded.
-
-### Create a New OIDC App in Okta
-
-You will need to create an OIDC Application in Okta to get your settings to perform authentication. 
-
-1. Log in to your developer account on [developer.okta.com](https://developer.okta.com).
-2. Navigate to **Applications** and click on **Add Application**.
-3. Select **Native** and click **Next**. 
-4. Give the application a name (e.g., `My Electron App`) and add `http://localhost:8000` as a Login redirect URI.
-5. For Grant type allowed, select **Refresh Token** in addition to **Authorization Code**.
-6. Click **Done**.
 
 ## Links
 
