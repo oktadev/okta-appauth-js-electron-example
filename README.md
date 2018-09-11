@@ -73,7 +73,7 @@ To package your app for production, [electron-builder](https://www.electron.buil
 * `npm run pack` will generate the package directory without really packaging it. This is useful for testing purposes.
 * `npm run dist` will package in a distributable format (e.g. dmg, windows installer, deb package).
 
-If the app doesn't start after packaging, it's likely because you don't have [code signing](https://www.electron.build/code-signing) configured. To disable Code Signing when building for macOS, run `export CSC_IDENTITY_AUTO_DISCOVERY=false`. If you have an Apple Developer Account, open Xcode, go to **Preferences** > **Accounts** and make sure you're logged in and your development certificates are downloaded.
+**NOTE:** If the app doesn't start after packaging, it's likely because you don't have [code signing](https://www.electron.build/code-signing) configured. To disable Code Signing when building for macOS, run `export CSC_IDENTITY_AUTO_DISCOVERY=false`. If you have an Apple Developer Account, open Xcode, go to **Preferences** > **Accounts** and make sure you're logged in and your development certificates are downloaded.
 
 ## Links
 
