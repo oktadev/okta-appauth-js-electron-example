@@ -46,8 +46,8 @@ const requestor = new NodeRequestor();
 const openIdConnectUrl = 'https://dev-669532.oktapreview.com/oauth2/default';
 
 /* example client configuration */
-const clientId = '0oag7el943uPssHRc0h7';
-const redirectUri = 'http://127.0.0.1:8000';
+const clientId = '0oag7tjqk1llPDKmx0h7';
+const redirectUri = 'http://localhost:8000';
 const scope = 'openid profile offline_access';
 
 export class AuthFlow {

@@ -6,8 +6,11 @@
   "scripts": {
     "compile": "tsc",
     "watch": "tsc --watch",
-    "start": "npm run-script compile && node_modules/.bin/electron .",
-    "dev": "npm run-script watch & node_modules/.bin/electron ."
+    "start": "npm run compile && npx electron .",
+    "dev": "npm run watch & npx electron .",
+    "pack": "npm run compile && electron-builder --dir",
+    "dist": "npm run compile && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
   "files": [
     "built/**"
@@ -27,7 +30,14 @@
   },
   "devDependencies": {
     "electron": "^2.0.2",
-    "electron-builder": "^20.15.1",
+    "electron-builder": "^20.28.4",
     "typescript": "^3.0.3"
+  },
+  "build": {
+    "appId": "com.okta.developer.electron",
+    "productName": "Electron Awesomeness",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
   }
 }
