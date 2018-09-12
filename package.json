@@ -7,7 +7,7 @@
     "compile": "tsc",
     "watch": "tsc --watch",
     "start": "npm run compile && npx electron .",
-    "dev": "npm run watch & npx electron .",
+    "dev": "npm run compile && npm run watch & npx electron .",
     "pack": "npm run compile && electron-builder --dir",
     "dist": "npm run compile && electron-builder",
     "postinstall": "electron-builder install-app-deps"

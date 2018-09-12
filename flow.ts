@@ -46,7 +46,7 @@ const requestor = new NodeRequestor();
 const openIdConnectUrl = 'https://dev-669532.oktapreview.com/oauth2/default';
 
 /* your Okta client configuration */
-const clientId = '0oag7tjqk1llPDKmx0h7';
+const clientId = '0oag8pxhaf8ufuymG0h7';
 const redirectUri = 'http://localhost:8000';
 const scope = 'openid profile offline_access';
 
