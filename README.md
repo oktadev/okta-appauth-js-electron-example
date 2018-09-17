@@ -2,9 +2,9 @@
  
 This example app shows how to build an Electron app and authentication with AppAuth-JS and PKCE (Proof Key for Code Exchange).
 
-This app was built by forking [appauth-js-electron-sample](https://github.com/googlesamples/appauth-js-electron-sample), adding PKCE support, and validating that it works with Okta. I leveraged [these PKCE code samples](https://github.com/openid/AppAuth-JS/issues/28).
+Please read [Build a Desktop App with Electron and Authentication](https://developer.okta.com/blog/2018/09/17/desktop-app-electron-authentication) to see how this app was created.
 
-<!-- Please read [Build a Java EE REST API; Secure it with JWT and OIDC]() to see how this app was created. -->
+This app was built by forking [appauth-js-electron-sample](https://github.com/googlesamples/appauth-js-electron-sample), adding PKCE support, and validating that it works with Okta. I leveraged [these PKCE code samples](https://github.com/openid/AppAuth-JS/issues/28).
 
 **Prerequisites:** [Node.js](https://nodejs.org/) and an [Okta Developer Account](https://developer.okta.com).
 
@@ -84,7 +84,7 @@ This example uses the following open source libraries:
 
 ## Help
 
-Please post any questions as comments on the [blog post](), or visit our [Okta Developer Forums](https://devforum.okta.com/). You can also email developers@okta.com if you'd like to create a support ticket.
+Please post any questions as comments on the [blog post](https://developer.okta.com/blog/2018/09/17/desktop-app-electron-authentication), or visit our [Okta Developer Forums](https://devforum.okta.com/). You can also email developers@okta.com if you'd like to create a support ticket.
 
 ## License
 
