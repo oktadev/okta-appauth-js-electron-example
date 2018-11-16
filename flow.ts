@@ -112,14 +112,13 @@ export class AuthFlow {
     extras['code_challenge_method'] = 'S256';
 
     // create a request
-    const request = new AuthorizationRequest(
-      clientId,
-      redirectUri,
-      scope,
-      AuthorizationRequest.RESPONSE_TYPE_CODE,
-      undefined /* state */,
-      extras
-    );
+    const request = new AuthorizationRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scope,
+      response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+      extras: extras
+    });
 
     log('Making authorization request ', this.configuration, request);
 
@@ -138,14 +137,13 @@ export class AuthFlow {
     let tokenRequestExtras = { code_verifier: this.challengePair.verifier };
 
     // use the code to make the token request.
-    let request = new TokenRequest(
-      clientId,
-      redirectUri,
-      GRANT_TYPE_AUTHORIZATION_CODE,
-      code,
-      undefined,
-      tokenRequestExtras
-    );
+    let request = new TokenRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
+      code: code,
+      extras: tokenRequestExtras
+    });
 
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
@@ -180,13 +178,12 @@ export class AuthFlow {
       // do nothing
       return Promise.resolve(this.accessTokenResponse.accessToken);
     }
-    let request = new TokenRequest(
-      clientId,
-      redirectUri,
-      GRANT_TYPE_REFRESH_TOKEN,
-      undefined,
-      this.refreshToken
-    );
+    let request = new TokenRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      grant_type: GRANT_TYPE_REFRESH_TOKEN,
+      refresh_token: this.refreshToken
+    });
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
       .then(response => {
