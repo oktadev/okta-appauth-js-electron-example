@@ -20,6 +20,7 @@ import {
   AuthorizationRequestHandler
 } from '@openid/appauth/built/authorization_request_handler';
 import { AuthorizationServiceConfiguration } from '@openid/appauth/built/authorization_service_configuration';
+import { NodeCrypto } from '@openid/appauth/built/node_support/';
 import { NodeBasedHandler } from '@openid/appauth/built/node_support/node_request_handler';
 import { NodeRequestor } from '@openid/appauth/built/node_support/node_requestor';
 import {
@@ -32,8 +33,7 @@ import { TokenResponse } from '@openid/appauth/built/token_response';
 
 import { log } from './logger';
 import { StringMap } from '@openid/appauth/built/types';
-import { AuthService } from './pkce';
-import { EventEmitter } from 'events';
+import EventEmitter = require('events');
 
 export class AuthStateEmitter extends EventEmitter {
   static ON_TOKEN_RESPONSE = 'on_token_response';
@@ -42,11 +42,8 @@ export class AuthStateEmitter extends EventEmitter {
 /* the Node.js based HTTP client. */
 const requestor = new NodeRequestor();
 
-/* your Okta org URL */
-const openIdConnectUrl = 'https://dev-669532.oktapreview.com/oauth2/default';
-
-/* your Okta client configuration */
-const clientId = '0oag8pxhaf8ufuymG0h7';
+const openIdConnectUrl = 'https://dev-737523.oktapreview.com/oauth2/default';
+const clientId = '0oahoeur00cVZWSpP0h7';
 const redirectUri = 'http://localhost:8000';
 const scope = 'openid profile offline_access';
 
@@ -55,7 +52,6 @@ export class AuthFlow {
   private authorizationHandler: AuthorizationRequestHandler;
   private tokenHandler: TokenRequestHandler;
   readonly authStateEmitter: AuthStateEmitter;
-  private challengePair: { verifier: string, challenge: string };
 
   // state
   private configuration: AuthorizationServiceConfiguration | undefined;
@@ -75,15 +71,18 @@ export class AuthFlow {
     this.notifier.setAuthorizationListener((request, response, error) => {
       log('Authorization request complete ', request, response, error);
       if (response) {
-        this.makeRefreshTokenRequest(response.code)
-            .then(result => this.performWithFreshTokens())
-            .then(() => {
-              this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE);
-              log('All Done.');
-            })
+        let codeVerifier: string | undefined;
+        if(request.internal && request.internal.code_verifier) {
+          codeVerifier = request.internal.code_verifier;
+        }
+        this.makeRefreshTokenRequest(response.code, codeVerifier)
+          .then(result => this.performWithFreshTokens())
+          .then(() => {
+            this.authStateEmitter.emit(AuthStateEmitter.ON_TOKEN_RESPONSE);
+            log('All Done.');
+          });
       }
     });
-    this.challengePair = AuthService.getPKCEChallengePair();
   }
 
   fetchServiceConfiguration(): Promise<void> {
@@ -107,19 +106,14 @@ export class AuthFlow {
       extras['login_hint'] = username;
     }
 
-    // PKCE
-    extras['code_challenge'] = this.challengePair.challenge;
-    extras['code_challenge_method'] = 'S256';
-
     // create a request
-    const request = new AuthorizationRequest(
-      clientId,
-      redirectUri,
-      scope,
-      AuthorizationRequest.RESPONSE_TYPE_CODE,
-      undefined /* state */,
-      extras
-    );
+    const request = new AuthorizationRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      scope: scope,
+      response_type: AuthorizationRequest.RESPONSE_TYPE_CODE,
+      extras: extras
+    }, new NodeCrypto());
 
     log('Making authorization request ', this.configuration, request);
 
@@ -129,23 +123,25 @@ export class AuthFlow {
     );
   }
 
-  private makeRefreshTokenRequest(code: string): Promise<void> {
+  private makeRefreshTokenRequest(code: string, codeVerifier?: string): Promise<void> {
     if (!this.configuration) {
       log('Unknown service configuration');
       return Promise.resolve();
     }
 
-    let tokenRequestExtras = { code_verifier: this.challengePair.verifier };
+    const extras: StringMap = {};
+    if (codeVerifier) {
+      extras.code_verifier = codeVerifier;
+    }
 
     // use the code to make the token request.
-    let request = new TokenRequest(
-      clientId,
-      redirectUri,
-      GRANT_TYPE_AUTHORIZATION_CODE,
-      code,
-      undefined,
-      tokenRequestExtras
-    );
+    let request = new TokenRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      grant_type: GRANT_TYPE_AUTHORIZATION_CODE,
+      code: code,
+      extras: extras
+    });
 
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
@@ -180,13 +176,12 @@ export class AuthFlow {
       // do nothing
       return Promise.resolve(this.accessTokenResponse.accessToken);
     }
-    let request = new TokenRequest(
-      clientId,
-      redirectUri,
-      GRANT_TYPE_REFRESH_TOKEN,
-      undefined,
-      this.refreshToken
-    );
+    let request = new TokenRequest({
+      client_id: clientId,
+      redirect_uri: redirectUri,
+      grant_type: GRANT_TYPE_REFRESH_TOKEN,
+      refresh_token: this.refreshToken
+    });
     return this.tokenHandler
       .performTokenRequest(this.configuration, request)
       .then(response => {
