@@ -69,7 +69,7 @@ export class App {
     this.fetchUserInfo.addEventListener('click', () => {
       this.authFlow.performWithFreshTokens().then(accessToken => {
         let request =
-            new Request('https://dev-669532.oktapreview.com/oauth2/default/v1/userinfo', {
+            new Request('https://dev-737523.oktapreview.com/oauth2/default/v1/userinfo', {
               headers: new Headers({'Authorization': `Bearer ${accessToken}`}),
               method: 'GET',
               cache: 'no-cache'
