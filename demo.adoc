@@ -54,7 +54,7 @@ The brackets at the end of each step indicate the alias's or IntelliJ Live Templ
 
 . Install electron-builder
 
-  npm i -D electron-builder
+  npm i -D electron-builder@20.38.4
 
 . Add a `build` section to `package.json` [`electron-build`]
 
