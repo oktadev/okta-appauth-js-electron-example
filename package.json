@@ -1,6 +1,6 @@
 {
   "name": "appauth-electron",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An Electron App which uses @openid/appauth",
   "main": "built/index.js",
   "scripts": {
@@ -23,15 +23,15 @@
   "license": "MIT",
   "repository": "https://github.com/oktadeveloper/okta-appauth-js-electron-example",
   "dependencies": {
-    "@openid/appauth": "^1.1.1",
+    "@openid/appauth": "^1.2.0",
     "@types/react": "^16.3.17",
     "@types/react-dom": "^16.0.6",
     "material-design-lite": "^1.3.0"
   },
   "devDependencies": {
-    "electron": "^3.0.0",
-    "electron-builder": "^20.28.4",
-    "typescript": "^3.0.3"
+    "electron": "^4.0.1",
+    "electron-builder": "^20.38.4",
+    "typescript": "^3.2.0"
   },
   "build": {
     "appId": "com.okta.developer.electron",
