@@ -15,14 +15,15 @@ The brackets at the end of each step indicate the alias's or IntelliJ Live Templ
 
   "@openid/appauth": "^1.2.0",
   "electron": "^4.0.1",
+  "typescript": "^3.2.0"
 
-. Update `flow.ts` to add PKCE support [`flow-pkce`]
+. https://github.com/googlesamples/appauth-js-electron-sample/blob/50d98d888ca9299708f71e8bce00101048389260/flow.ts[Update] `flow.ts` to add PKCE support
 
 . Install dependencies and run the app
 
   cd okta-electron-example
   npm i
-  npm run dev
+  npm start
 
 . Show login with Google
 
@@ -49,6 +50,8 @@ The brackets at the end of each step indicate the alias's or IntelliJ Live Templ
 . Modify a user the add a value for `picture`
 
   https://www.okta.com/sites/all/themes/Okta/images/logos/developer/Dev_Logo-02_Large.png
+
+. Refresh and show how avatar works now
 
 === Package for Production
 
