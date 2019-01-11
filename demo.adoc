@@ -1,0 +1,87 @@
+== Electron Demo Steps
+
+The brackets at the end of each step indicate the alias's or IntelliJ Live Templates to use. You can find the template definitions at https://github.com/mraible/idea-live-templates[mraible/idea-live-templates].
+
+=== AppAuth Electron Example
+
+. Clone AppAuth Electron Example
+
+  git clone https://github.com/googlesamples/appauth-js-electron-sample.git okta-electron-example
+
+. Update scripts and version dependencies in `package.json`
+
+  "start": "npm run compile && npx electron .",
+  "dev": "npm run compile && npm run watch & npx electron ."
+
+  "@openid/appauth": "^1.2.0",
+  "electron": "^4.0.1",
+  "typescript": "^3.2.0"
+
+. https://github.com/googlesamples/appauth-js-electron-sample/blob/50d98d888ca9299708f71e8bce00101048389260/flow.ts[Update] `flow.ts` to add PKCE support
+
+. Install dependencies and run the app
+
+  cd okta-electron-example
+  npm i
+  npm start
+
+. Show login with Google
+
+=== Authentication with Okta
+
+. Create Okta Native application, use `http://localhost:8000` as a Login redirect URI
+
+. Update `flow.ts` to use your Okta app settings
+
+. Update `app.ts` to use your app's `/userinfo` endpoint
+
+. Show how **USER INFO** link doesn't work with developer tools
+
+. Change `scope` to include `profile offline_access` in `flow.ts`
+
+. Refresh (**CMD+R**) and show how **USER INFO** works
+
+=== Add Picture
+
+. Add a `picture` attribute to your user on Okta; **Users** > **Profile Editor**
+
+. Create mapping `user.picture` to `picture` in the Profile Editor
+
+. Modify a user the add a value for `picture`
+
+  https://www.okta.com/sites/all/themes/Okta/images/logos/developer/Dev_Logo-02_Large.png
+
+. Refresh and show how avatar works now
+
+=== Package for Production
+
+. Install electron-builder
+
+  npm i -D electron-builder@20.38.4
+
+. Add a `build` section to `package.json` [`electron-build`]
+
+  "build": {
+    "appId": "com.okta.developer.electron",
+    "productName": "Electron Awesomeness",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  }
+
+. Add `pack`, `dist`, and `postinstall` scripts [`electron-dist`]
+
+  "scripts": {
+    ...
+    "pack": "npm run compile && electron-builder --dir",
+    "dist": "npm run compile && electron-builder",
+    "postinstall": "electron-builder install-app-deps"
+  }
+
+. Build for production
+
+  npm run dist
+
+. Fini!
+
+Source: https://developer.okta.com/blog/2018/09/17/desktop-app-electron-authentication
